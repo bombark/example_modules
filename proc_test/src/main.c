@@ -5,14 +5,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "thread.h"
+#include <signal.h>
+#include "accelerometer.h"
+
+
+volatile int gIsOk;
 
 // =============================================================================
 //  Events
 // =============================================================================
 
-
-
+void my_handler(int s) {
+    gIsOk = 0;
+}
 
 
 // =============================================================================
@@ -21,8 +26,12 @@
 
 int main()
 {
-    ThreadCtx unit;
-    unit.start();
-    unit.join();
+    gIsOk = 1;
+    accelerometer_start();
+    signal(SIGINT,my_handler);
+    while ( gIsOk == 1 ){
+        sleep(1);
+    }
+    accelerometer_stop();
     return 0;
 }
